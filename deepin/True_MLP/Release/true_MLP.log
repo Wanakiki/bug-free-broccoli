@@ -1,0 +1,15 @@
+﻿  main.cpp
+c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(72): warning C4305: “参数”: 从“double”到“float”截断
+c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(119): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(125): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(152): warning C4473: “fscanf_s”: 没有为格式字符串传递足够的参数
+  c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(152): note: 占位符和其参数预计 2 可变参数，但提供的却是 1 参数
+  c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(152): note: 缺失的可变参数 2 为格式字符串“%c”所需
+  c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(152): note: 此参数用作缓冲区大小
+c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(108): warning C4101: “ContLine”: 未引用的局部变量
+c:\users\administrator\documents\true_mlp\true_mlp\true_mlp\MLP.h(363): warning C4129: “%”: 不可识别的字符转义序列
+main.cpp(7): warning C4305: “参数”: 从“double”到“float”截断
+  正在生成代码
+  All 218 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  已完成代码的生成
+  true_MLP.vcxproj -> C:\Users\Administrator\Documents\true_MLP\true_MLP\Release\true_MLP.exe
