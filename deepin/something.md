@@ -18,3 +18,5 @@ def compute_cost(A2, Y, parameters):
 db = np.sum(dZ, axis = 1, keepdims = True) / m
 ```
 求和需要keepdims保证前后不变，axis = 1 是行， = 0 为列
+
+- 非标准正态分布:`` Two-by-four array of samples from N(3, 6.25):2.5*np.random.randn(2,4)+3``

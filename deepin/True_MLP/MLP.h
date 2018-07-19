@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <stdio.h>
 using namespace std;
 float sample_from_gaussian(float miu, float sigma){
 	static float V1, V2, S;
@@ -52,7 +53,7 @@ public:
 	float** dw;
 	Layer* pre_layer;
 	Layer* next_layer;
-	Layer::Layer()
+	Layer()
 	{
 	}
 	void Set_nodes(int n)
@@ -99,7 +100,7 @@ class Data_Layer: public Layer
 {
 public:
 	int data_num;
-	int* label;
+	int* label;	// M or B
 	int label_count;
 	float** data;
 	void Read_data(const char* data_path)
@@ -112,15 +113,15 @@ public:
 		//getline(fin,ReadLine);
 		bool initial_flag = false;
 		int label_id = 0;
-		fstream fin(data_path); 
-		while (getline(fin, ReadLine))  
+		fstream fin(data_path);
+		while (getline(fin, ReadLine))
 		{
 			node_num = 0;
 			for (int i = 0; i<ReadLine.length(); i++)
 			{
 				if (ReadLine[i] == '\t')
 					node_num++;
-			}
+			}	//发现一个特征  增加一个节点
 			bool flag = false;
 			for (int i = 0; i < label_lists.size(); i++)
 			{
@@ -129,11 +130,12 @@ public:
 					flag = true;
 					break;
 				}
-			}
+			}	//判断labe_list是否含有首个元素
 			if (!flag)
 				label_lists.push_back(ReadLine[0]);
 			data_num++;
-		}
+		}	//将M B添加进label_lists
+		//仅有两个例子的情况可以直接添加，但是为了解决更多的问题应该考虑这样去写
 		fin.close();
 		label_count = label_lists.size();
 		label = new int[data_num];
@@ -146,22 +148,22 @@ public:
 				data[i][j] = 0;
 		}
 		FILE* fp;
-		fopen_s(&fp,data_path, "r");
+		fp = fopen(data_path, "r");
 		for (int i = 0; i < data_num; i++)
 		{
-			fscanf_s(fp, "%c\t", &tempchar);
+			fscanf(fp, "%c\t", &tempchar);
 			if (tempchar == 'M')
 				label[i] = 0;
 			else
 				label[i] = 1;
 			for (int j = 1; j < node_num+1; j++)
 			{
-				fscanf_s(fp, "%f\t", &data[i][j-1]);
+				fscanf(fp, "%f\t", &data[i][j-1]);
 			}
-				
+
 		}
 	}
-	
+
 };
 class Out_Layer : public Layer
 {
@@ -170,7 +172,7 @@ class Out_Layer : public Layer
 	{
 		float sum = 0;
 		for (int i = 0; i < node_num; i++)
-		{
+		{q
 			y[i] = exp(u[i]);
 			sum += exp(u[i]);
 		}
@@ -192,7 +194,8 @@ public:
 	float train_acc;
 	float test_acc;
 	float error;
-	MLP::MLP(float lr,int bs,int layer_n,int node_nums[],const char train_path[],const char test_path[],int ep)
+	//MLP::MLP(float lr,int bs,int layer_n,int node_nums[],const char train_path[],const char test_path[],int ep)
+	MLP(float lr,int bs,int layer_n,int node_nums[],const char train_path[],const char test_path[],int ep)
 	{
 		learning_rate = lr;
 		batch_size = bs;
@@ -240,6 +243,7 @@ public:
 				data_layer->y[j] = data_layer->data[data_id][j];
 			for (int j = 0; j < layer_num; j++)
 			{
+
 				for (int k = 0; k < layers[j].node_num; k++)
 				{
 					layers[j].u[k] = 0;
@@ -251,6 +255,8 @@ public:
 				}
 				layers[j].Active();
 			}
+
+
 			for (int j = 0; j < out_layer->node_num; j++)
 			{
 				out_layer->u[j] = 0;
@@ -258,24 +264,28 @@ public:
 				{
 					out_layer->u[j] += out_layer->pre_layer->y[k] * out_layer->w[k][j];
 				}
-				
+
 			}
 			out_layer->Active();
-			for (int j = 0; j < out_layer->node_num; j++)
+			for (int j = 0; j < out_layer->node_num;
+				 j++){
+					 printf("node_num:%d %d , %d, %d, %d\n",out_layer->node_num, j,max_value,max_id,out_layer->y[j]);
 				if (max_value < out_layer->y[j])
 				{
 					max_value = out_layer->y[j];
 					max_id = j;
 				}
+			}
+			printf("max_id is:%d, data_val is:%d\n", max_id,data_layer->label[data_id]);
 			if (max_id == data_layer->label[data_id])
 				return 1;
 			else
 				return 0;
-		
+
 	}
 	void Backward(Data_Layer* data_layer,int data_id)
 	{
-		
+
 			for (int j = 0; j < out_layer->node_num; j++)
 			{
 				out_layer->dy[j] = 0;
@@ -331,12 +341,13 @@ public:
 				layers[i].db[k] = 0;
 				layers[i].du[k] = 0;
 				layers[i].dy[k] = 0;
-			}	
+			}
 		}
-		
+
 	}
 	void Train()
 	{
+
 		for (int i = 0; i < epoches; i++)
 		{
 			int batch_count = 0;
