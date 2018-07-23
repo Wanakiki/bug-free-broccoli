@@ -16,8 +16,8 @@ def initialize_parameters(node_nums):
     for l in range(1, L):
         # 直接实现正态分布 mu = 0, sigma = 0.01
         parameters['W' + str(l)] = 0.01 * np.random.randn(node_nums[l], node_nums[l-1])
-        if(l != L - 1):
-            parameters['b' + str(l)] = 0.01 * np.random.randn(node_nums[l], 1)
+        parameters['b' + str(l)] = 0.01 * np.random.randn(node_nums[l], 1)
+        # 初始化最后一层的b 但是不更新
 
     return parameters
 
@@ -58,50 +58,84 @@ def Read_data(path, node_nums, first_ = False):
         return data, label_list
     return data
 
-# y = f(u) = f(wx + b)
+# A = F(Z) = F(WX + b)
+# caches 为缓存区
+# linear_cache (A, W, b)
+# activation_cache(Z)
 def linear_forward(A, W, b):
     Z = np.dot(W, A) + b
     cache =(A, W, b)
-    reutrn Z, cache
+    return Z, cache
 
 def linear_activation_forward(A_prew, W, b, activation):
     if activation == "sigmoid":
         Z, linear_cache = linear_forward(A_prew, W, b)
-        A, activation_cache = sigmoid(Z)
+        A, activation_cache = sigmoid(Z), Z
 
     elif activation == "softmax":
         Z, linear_cache = linear_forward(A_prew, W, b)
-        A, activation_cache = softmax(Z)
+        A, activation_cache = softmax(Z), Z
 
     cache = (linear_cache, activation_cache)
     return A, cache
 
-def L_model_forward(X, parameters, L):
+
+def get_max_value(martix):
+    '''
+    得到矩阵中每一列最大的值的坐标
+    '''
+    res_list=[]
+    #res_ = []
+    for j in range(len(martix[0])):
+        one_list=[]
+        for i in range(len(martix)):
+            one_list.append((martix[i][j]))
+        res_list.append(one_list.index(max(one_list)))
+        #res_.append(max(one_list))
+    #print("查找到的最大值：",res_)
+    return res_list
+
+def L_model_backward(AL, Y, caches, label_list):
+    grads = {}
+    L = len(caches) #少一个参数
+    m = AL.shape[1] #总数
+    Y = Y.reshape(AL.shape)
+
+    for
+    dAL =
+def L_model_forward(X, Y, parameters, L):
+    global AL
+    global caches
     caches = []
     A = X
     for l in range(1, L):
         A_prew = A
-        A, cache = linear_activation_forward(A_pew, parameters['W' + str(l)],parameters['b' + str(l)], "sigmoid")
+        A, cache = linear_activation_forward(A_prew, parameters['W' + str(l)],parameters['b' + str(l)], "sigmoid")
         caches.append(cache)
-
-    AL, cache = linear_activation_forward(A, parameters['W' + str[L]], parameters['b' + str(L)], "softmax")
+    AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], "softmax")
     caches.append(cache)
-    return AL, caches
+
+    print("AL is:",AL.shape,AL)
+    result = get_max_value(AL)
+    return Y == result
 
 
-def Forward(parameters, data, L):
-    max_id = 0
-    max_value = 0
-    for i in range(1, L):
 
 def MLP(learning_rate, batch_size, node_nums, train_path, test_path, epoches):
     train_data, label_list = Read_data(train_path, node_nums, True)
     test_data = Read_data(test_path, node_nums)
     parameters = initialize_parameters(node_nums)
-    L = len(node_nums)
+    L = len(node_nums) -1
+    #AL, caches = L_model_forward(train_data['X'], parameters, L);
+    result = L_model_forward(train_data['X'], train_data['Y'], parameters, L);
     print(node_nums)
     print(train_data)
     print(label_list)
     print(parameters['W3'].shape)
+    #print(result,np.sum(result))
+    print("AL :",AL.shape,"caches:",len(caches))
 
+# 全局
+AL = np.random.randn(1,10)
+caches = []
 MLP(0.1, 10, [40,40], "UCI.txt", "UCI_test.txt",10000)
