@@ -133,7 +133,7 @@ class MLP:
     def initialize_parameters(self, mu, sigma):
         np.random.seed(0)
         self.L = len(self.node_nums)
-        parameters = {}
+        #parameters = {}
         #cousera  从1开始循环，长度数组就不用考虑了/dz
         for l in range(1, self.L):
             #print("初始化：",l)
