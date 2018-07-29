@@ -177,6 +177,6 @@ class MLP:
 
 #自定义隐藏层的节点数
 # __init__(self, learning_rate, batch_size, node_nums, train_path, test_path, epoches, mu ,sigma ):
-my_mlp = MLP(0.2, 16, [30],"UCI_test.txt","UCI.txt",5000, 0, 0.01)
+my_mlp = MLP(0.1, 10, [40,40],"UCI_test.txt","UCI.txt",4000, 0, 0.01)
 my_mlp.train()
 my_mlp.predict()
