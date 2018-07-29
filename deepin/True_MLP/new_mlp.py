@@ -76,7 +76,7 @@ class MLP:
         m = batch[1].shape[1]
         self.caches["dZ"+str(self.L-1)] = self.dz_softmax(self.caches["A"+str(self.L-1)],batch)
         for l in reversed(range(1, self.L)):
-            self.caches["dW"+str(l)] = np.dot(self.caches["dZ"+str(l)],self.caches["A"+str(l-1)].T)
+            self.caches["dW"+str(l)] = np.dot(self.caches["dZ"+str(l)],self.caches["A"+str(l-1)].T) / m # dW同样需要除m
             if l != self.L-1:
                 self.caches["db"+str(l)] = np.sum(self.caches["dZ"+str(l)]) / m
             if l != 1:
