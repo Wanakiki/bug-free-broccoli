@@ -117,4 +117,3 @@ def pool_forward(A_prev, hparameters, mode = "max"):
 
     cache = (A_prev, hparameters)
     return A, cache
-
