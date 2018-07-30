@@ -172,7 +172,7 @@ class Out_Layer : public Layer
 	{
 		float sum = 0;
 		for (int i = 0; i < node_num; i++)
-		{q
+		{
 			y[i] = exp(u[i]);
 			sum += exp(u[i]);
 		}
@@ -269,14 +269,13 @@ public:
 			out_layer->Active();
 			for (int j = 0; j < out_layer->node_num;
 				 j++){
-					 printf("node_num:%d %d , %d, %d, %d\n",out_layer->node_num, j,max_value,max_id,out_layer->y[j]);
-				if (max_value < out_layer->y[j])
+					 //ax_value < out_layer->y[j])
 				{
 					max_value = out_layer->y[j];
 					max_id = j;
 				}
 			}
-			printf("max_id is:%d, data_val is:%d\n", max_id,data_layer->label[data_id]);
+			//printf("max_id is:%d, data_val is:%d\n", max_id,data_layer->label[data_id]);
 			if (max_id == data_layer->label[data_id])
 				return 1;
 			else

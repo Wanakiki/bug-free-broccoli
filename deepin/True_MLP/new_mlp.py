@@ -20,6 +20,7 @@ def get_max_value(martix):
         res_list.append(one_list.index(max(one_list)))
     return res_list
 class MLP:
+    error = []
     acc = []
     parameters = {}
     caches = {}
@@ -40,10 +41,15 @@ class MLP:
 
     def train(self):
         p = progressbar.ProgressBar()
+        flag_i = -1
         for i in p(range(self.epoches)):
             for batch in self.mini_batches_train:
                 self.L_model_forward(batch)
-                self.L_model_backward(batch)
+                if(i != flag_i):
+                    self.L_model_backward(batch, True)
+                    flag_i = i
+                else:
+                    self.L_model_backward(batch)
                 self.update()
             self.L_model_forward((self.train_data["X"], self.train_data["Y"]))
             self.acc.append(np.sum(self.result == self.train_data["Y"]) / self.train_data["Y"].shape[1])
@@ -51,6 +57,9 @@ class MLP:
     def predict(self):
         plt.plot(self.acc)
         plt.title("acc-of-trainset  :rate:"+str(self.learning_rate)+" batch_size:"+str(self.batch_size)+" epoches:"+str(self.epoches)+" node_nums:"+str(self.node_nums))
+        plt.show()
+        plt.plot(self.error)
+        plt.title("error of the first bitch")
         plt.show()
         print("=============最终结果(训练集在先)=================")
         self.L_model_forward((self.train_data["X"], self.train_data["Y"]), True)
@@ -72,9 +81,11 @@ class MLP:
                     dz[i][j] -=1
         return dz
 
-    def L_model_backward(self, batch):
+    def L_model_backward(self, batch,flag = False):
         m = batch[1].shape[1]
         self.caches["dZ"+str(self.L-1)] = self.dz_softmax(self.caches["A"+str(self.L-1)],batch)
+        if flag:
+            self.error.append((self.caches["dZ"+str(self.L-1)]**2).sum() / m)  #每个循环次统计一次，不然图像太紧
         for l in reversed(range(1, self.L)):
             self.caches["dW"+str(l)] = np.dot(self.caches["dZ"+str(l)],self.caches["A"+str(l-1)].T) / m # dW同样需要除m
             if l != self.L-1:
