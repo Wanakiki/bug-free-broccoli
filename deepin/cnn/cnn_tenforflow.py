@@ -6,7 +6,7 @@ import scipy
 from PIL import Image
 from scipy import ndimage
 import tensorflow as tf
-#from tensorflow.framework import ops
+from tensorflow.python.framework import ops
 from cnn_utils import *
 
 np.random.seed(1)
@@ -125,9 +125,9 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.009, num_epochs = 
     ops.reset_default_graph()
     tf.set_random_seed(1)
     seed = 3
-    (m, n_H0, n_Y0, n_C0) = X_train.shape
+    (m, n_H0, n_W0, n_C0) = X_train.shape
     n_y = Y_train.shape[1]
-    cost = []
+    costs = []
 
     X,Y = creat_placeholders(n_H0, n_W0, n_C0, n_y)
 
@@ -169,21 +169,21 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.009, num_epochs = 
         plt.title("Learning rate ="+str(learning_rate))
         plt.show()
 
-        predict_op = tf.argmax(Z3, 1)
-        correct_prediction = tf.equal(predict_op, tf.argmax(Y,1))
+        predict_op = tf.argmax(Z3, 1)   #返回一个轴上最大值的索引
+        correct_prediction = tf.equal(predict_op, tf.argmax(Y,1))   #判断两个是否相等 返回0、1
 
-        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float")) #计算平均值
         print(accuracy)
-        train_accuracy = accuracy.eval({X:X_train, Y:Y_train})
+        train_accuracy = accuracy.eval({X:X_train, Y:Y_train})  #不懂eval
         test_accuracy = accuracy.eval({X:X_test, Y:Y_test})
         print("Train Accuracy:",train_accuracy)
         print("Test Accuracy:",test_accuracy)
         return train_accuracy,test_accuracy, parameters
 
 
+X_train = X_train_orig/255.
+X_test = X_test_orig/255.
+Y_train = convert_to_one_hot(Y_train_orig, 6).T
+Y_test = convert_to_one_hot(Y_test_orig, 6).T
 
-
-
-
-
-
+_, _, parameters = model(X_train, Y_train, X_test, Y_test)
