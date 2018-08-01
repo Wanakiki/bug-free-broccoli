@@ -6,7 +6,7 @@ import scipy
 from PIL import Image
 from scipy import ndimage
 import tensorflow as tf
-from tensorflow.python.framework import ops
+#from tensorflow.python.framework import ops
 from cnn_utils import *
 
 np.random.seed(1)
@@ -14,13 +14,13 @@ np.random.seed(1)
 X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
 
 
-index = 6       #改变index可以控制输出不同的图片
-plt.imshow(X_train_orig[index])
-import pylab
-pylab.show()
-print ("y = "+str(np.squeeze(Y_train_orig[:,index])))
+#index = 6       #改变index可以控制输出不同的图片
+#plt.imshow(X_train_orig[index])
+#import pylab
+#pylab.show()
+#print ("y = "+str(np.squeeze(Y_train_orig[:,index])))
 
-def creat_placeholders(n_H0, n_W0, n_C0, n_y):
+def create_placeholders(n_H0, n_W0, n_C0, n_y):
     """
     创建placeholder，为了session
 
@@ -121,7 +121,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.009, num_epochs = 
     parameters -- parameters learnt by the model. They can then be used to predict.
     懒了懒了/xk
     """
-
+    print("start model")
     ops.reset_default_graph()
     tf.set_random_seed(1)
     seed = 3
@@ -132,6 +132,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.009, num_epochs = 
     X,Y = creat_placeholders(n_H0, n_W0, n_C0, n_y)
 
     parameters = initialize_parameters()
+    print(parameters["W1"])
 
     Z3 = forward_propagation(X, parameters)
 
@@ -186,4 +187,16 @@ X_test = X_test_orig/255.
 Y_train = convert_to_one_hot(Y_train_orig, 6).T
 Y_test = convert_to_one_hot(Y_test_orig, 6).T
 
-_, _, parameters = model(X_train, Y_train, X_test, Y_test)
+#_, _, parameters = model(X_train, Y_train, X_test, Y_test)
+tf.reset_default_graph()
+
+with tf.Session() as sess:
+    np.random.seed(1)
+    X, Y = create_placeholders(64, 64, 3, 6)
+    parameters = initialize_parameters()
+    Z3 = forward_propagation(X, parameters)
+    init = tf.global_variables_initializer()
+    sess.run(init)
+    a = sess.run(Z3, {X: np.random.randn(
+        2, 64, 64, 3), Y: np.random.randn(2, 6)})
+    print("Z3 = " + str(a))

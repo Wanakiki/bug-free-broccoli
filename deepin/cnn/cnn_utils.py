@@ -3,7 +3,7 @@ import numpy as np
 import h5py
 import matplotlib.pyplot as plt
 import tensorflow as tf
-#from tensorflow/tensorflow/python/framework import ops
+#from tensorflow.python.framework import ops
 
 
 def load_dataset():
