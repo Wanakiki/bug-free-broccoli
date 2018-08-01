@@ -2,9 +2,20 @@
 
 ## 文件说明
 
-Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在课后题中提及，需要花时间理解，纯python实现cnn的[代码](cnn_first.py)：``cnn_first.py``，另外还有tensorflow实现的[版本](cnn_tensorflow.py)``cnn_tensorflow.py``，tensorflow实现版本依赖本文件夹中的``cnn_utils.py``文件提供一些必须的函数。
+Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在课后题中提及，需要花时间理解，纯python实现cnn的代码：[cnn_first.py](cnn_first.py)，另外还有tensorflow实现的版本：[cnn_tensorflow.py](cnn_tensorflow.py)，tensorflow实现版本依赖本文件夹中的[cnn_utils.py](cnn_utils.py)文件提供一些必须的函数。
 
-另外还在tensorflow上找到一个有关于MNIST数据集的入门教程
+另外还在tensorflow中文社区上找到一个有关于MNIST数据集的入门教程，下载了该数据集的压缩文件放到了datasets目录下，因为这个数据集文件读取相对麻烦，直接采用了提供的程序来提取数据，即[input_data.py](input_data.py)，再之后的几个文件中均使用了其中定义的函数。
+
+要注意的一点是input_data.py中的``read_data_sets``函数本身就可以创建文件夹并下载文件读取，只需要自己设置下目录，但不清楚linux与windows系统下方式是否相同。
+
+>MNIST数据集的图片大小为28*28=784，共有0~9十个标签，训练集有60000对数据，测试集有10000对数据。
+
+tensorflow社区代码的抄写（均与手写数字识别相关）：
+
+- 简单的神经网络：[cnn-xs-first.py](cnn-xs-first.py)
+- 卷积神经网络：[cnn-xs-second.py](cnn-xs-second.py)
+
+
 ## 一些有用的函数/方程
 
 ### 相关概念
