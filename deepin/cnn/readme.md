@@ -2,7 +2,9 @@
 
 ## 文件说明
 
-Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在课后题中提及，需要花时间理解，纯python实现cnn的[代码](cnn_first.py)，另外还有tensorflow实现的版本。
+Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在课后题中提及，需要花时间理解，纯python实现cnn的[代码](cnn_first.py)：``cnn_first.py``，另外还有tensorflow实现的[版本](cnn_tensorflow.py)``cnn_tensorflow.py``，tensorflow实现版本依赖本文件夹中的``cnn_utils.py``文件提供一些必须的函数。
+
+另外还在tensorflow上找到一个有关于MNIST数据集的入门教程
 ## 一些有用的函数/方程
 
 ### 相关概念

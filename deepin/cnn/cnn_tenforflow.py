@@ -6,7 +6,7 @@ import scipy
 from PIL import Image
 from scipy import ndimage
 import tensorflow as tf
-#from tensorflow.python.framework import ops
+from tensorflow.python.framework import ops
 from cnn_utils import *
 
 np.random.seed(1)
