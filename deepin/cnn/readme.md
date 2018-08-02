@@ -1,5 +1,7 @@
 # CNN相关内容
 
+装tensorflow的GPU版本的时候最好先把CPU的版本卸载掉。我的电脑在已有CPU版本的情况下安装GPU版本就没有识别到显卡，官网上没有提及这点，不过也有可能是我过程中操作有些疏忽。
+
 ## 文件说明
 
 Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在课后题中提及，需要花时间理解，纯python实现cnn的代码：[cnn_first.py](cnn_first.py)，另外还有tensorflow实现的版本：[cnn_tensorflow.py](cnn_tensorflow.py)，tensorflow实现版本依赖本文件夹中的[cnn_utils.py](cnn_utils.py)文件提供一些必须的函数。
@@ -10,10 +12,11 @@ Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在
 
 >MNIST数据集的图片大小为28*28=784，共有0~9十个标签，训练集有60000对数据，测试集有10000对数据。
 
-tensorflow社区代码的抄写（均与手写数字识别相关）：
+手写数字的尝试：
 
 - 简单的神经网络：[cnn-xs-first.py](cnn-xs-first.py)
-- 卷积神经网络：[cnn-xs-second.py](cnn-xs-second.py)
+- 卷积神经网络：[cnn-xs-second.py](cnn-xs-second.py)，因为采用了Adam算法，训练速度很快，并且成功率较高，但我还是想尝试梯度下降加上minibatch
+- 卷积神经网络，结构与第二版相同，但是采用梯度下降和minibatch的算法：[cnn-xs-third.py](cnn-xs-third.py)
 
 
 ## 一些有用的函数/方程

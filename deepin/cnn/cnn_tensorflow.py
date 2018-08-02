@@ -129,7 +129,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.009, num_epochs = 
     n_y = Y_train.shape[1]
     costs = []
 
-    X,Y = creat_placeholders(n_H0, n_W0, n_C0, n_y)
+    X,Y = create_placeholders(n_H0, n_W0, n_C0, n_y)
 
     parameters = initialize_parameters()
     print(parameters["W1"])
