@@ -94,8 +94,9 @@ class MLP:
                 self.caches["dA"+str(l-1)] = np.dot(self.parameters["W"+str(l)].T, self.caches["dZ"+str(l)])
                 self.caches["dZ"+str(l-1)] = dsigmoid(self.caches["A"+str(l-1)])*self.caches["dA"+str(l-1)]
         #print("反向之后：",len(self.caches))
+    
 
-
+        
 
 
     def L_model_forward(self, batch, flag = False):

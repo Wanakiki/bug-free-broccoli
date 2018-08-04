@@ -17,6 +17,7 @@ Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在
 - 简单的神经网络：[cnn-xs-first.py](cnn-xs-first.py)
 - 卷积神经网络：[cnn-xs-second.py](cnn-xs-second.py)，因为采用了Adam算法，训练速度很快，并且成功率较高，但我还是想尝试梯度下降加上minibatch
 - 卷积神经网络，结构与第二版相同，但是采用梯度下降和minibatch的算法：[cnn-xs-third.py](cnn-xs-third.py)
+- 由上面的卷积神经网络简化得到的卷积神经网络，少了三层，但是效果并不是很差：[cnn-xs-cmfs.py](cnn-xs-cmfs.py)
 
 
 ## 一些有用的函数/方程
