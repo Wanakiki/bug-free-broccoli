@@ -4,7 +4,6 @@ import input_data
 
 mnist = input_data.read_data_sets('datasets',one_hot=True)
 
-
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
 
