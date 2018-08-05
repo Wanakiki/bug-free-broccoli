@@ -10,6 +10,12 @@ def relu(Z):
 def sigmoid(Z):
     return 1 / (1 + np.exp(-Z))
 
+def d_relu(Z):
+    dZ = np.zeros(Z.shape)
+    dZ = dZ > 0 
+    #print(dZ)
+    return dZ
+
 
 def zero_pad(X, pad):
     X_pad = np.pad(X, ((0,0),(pad,pad),(pad,pad),(0,0)), 'constant')
@@ -17,7 +23,7 @@ def zero_pad(X, pad):
 
 
 def softmax(X):
-    return np.exp(X) / np.sum(np.exp(X), axis=0)
+    return np.exp(X) / np.sum(np.exp(X), axis=1, keepdims=1)    #根据数据格式这里发生变化
 
 
 def conv_setp(a_slice_prev, W, b):
@@ -44,7 +50,7 @@ def conv2d(A_prev, W, b, hparameters):
     n_w = int((n_w_prev - f + 2*pad) / strides + 1)
 
     A_prev_pad = zero_pad(A_prev, pad)
-    assert(A_prev_pad.shape == (8,32,32,1))
+    #assert(A_prev_pad.shape == (8,32,32,1))
     Z = np.zeros((m, n_h, n_w, n_c))  # 初始化结果
     for i in range(m):
         a_prev_pad = A_prev_pad[i]
@@ -101,7 +107,7 @@ def conv_back(dZ, cache):
     """
     (A_prev, W, b, hparameters) = cache
     (f, f, n_c_prev, n_c) = np.shape(W)
-    (m, n_h_prev, n_w_prev, n_c_prev) = A_prev
+    (m, n_h_prev, n_w_prev, n_c_prev) = A_prev.shape
     (m, n_h, n_w, n_c) = np.shape(dZ)
     pad = hparameters['pad']
     strides = hparameters['strides']
@@ -135,7 +141,7 @@ def conv_back(dZ, cache):
                     db[:, :, :, c] += dZ[i, h, w, c]
 
     # 截去边缘就很秀
-    dA_prev[i, :, :, :] = dA_prev_pad[i, pad[0]:-pad[1], pad[2]: -pad[3], :]
+    dA_prev[i, :, :, :] = dA_prev_pad[i, pad:-pad, pad: -pad, :]
     return dA_prev, dW, db
 
 
@@ -145,7 +151,7 @@ def pool_back(dA, cache, mode="max"):
     (A_prev, hparameters) = cache
     """
     (A_prev, hparameters) = cache
-    f = hparameters['f']
+    f = hparameters["f"]
     strides = hparameters['strides']
     (m, n_h_prev, n_w_prev, n_c_prev) = np.shape(A_prev)
     (m, n_h, n_w, n_c) = np.shape(dA)
@@ -176,9 +182,10 @@ class model:
     W1 = np.random.randn(5,5,1,32)
     b1 = np.zeros((1,1,1,32))
     W2 = np.random.randn(14*14*32, 10)
-    b2 = np.zeros((1,1,1,10))
+    b2 = np.zeros((10))
     hparameters_conv = {'strides':1, 'pad':2}
     hparameters_pool_max = {'f':2, 'strides':2}
+    acc = []
 
     def __init__(self, learning_rate, batch_size, path, epochs):
         self.learning_rate = learning_rate 
@@ -196,36 +203,59 @@ class model:
             if index >= m:
                 index = 0
             self.forward(self.mini_batch_train[index])
+            self.back_ward(self.mini_batch_train[index])
+            self.update()
             index += 1
 
     def forward(self, batch):
         self.Z1 = conv2d(batch[0], self.W1, self.b1, self.hparameters_conv)
         self.A1 = relu(self.Z1)
-        print(self.A1.shape)
+        #print(self.A1.shape)
 
         self.P1 = max_pool(self.A1, self.hparameters_pool_max)
-        print(self.P1.shape)
+        #print(self.P1.shape)
         
-        self.P1 = np.reshape(self.P1, [-1, 14*14*32])
+        self.P1_fc = np.reshape(self.P1, [-1, 14*14*32])
 
-        self.Z1 = np.dot(self.P1, self.W2) + self.b2
+        print(self.P1_fc.shape)
+        self.Z2 = np.dot(self.P1_fc, self.W2) + self.b2
+        print(self.Z2.shape)
+        self.A2 = softmax(self.Z2)
+        #self.A3 = np.argmax(self.A2, axis= 1)
+        #self.A3 = self.A3 == np.argmax(batch[1], axis = 1)
+        self.A3 = np.argmax(batch[1], axis=1)
+        acc_temp = np.sum(np.argmax(self.A2, axis=1) == self.A3) / batch[0].shape[0]
+        self.acc.append(acc_temp)
+        #print(self.A2.shape)
+        print(acc_temp)
 
-        self.A2 = softmax(self.Z1)
-        self.A3 = np.argmax(self.A2, axis= 1)
-        self.A3 = self.A3 == mp.argmax(batch[1], axis = 1)
-        print(self.A2.shape)
-
+    def update(self):
+        self.W1 -= self.learning_rate * self.dW1
+        self.b1 -= self.learning_rate * self.db1
+        self.W2 -= self.learning_rate * self.dW2
+        self.b2 -= self.learning_rate * self.db2
+        
     def back_ward(self, batch):
-        self.dA2 = np.zeros(self.A2.shape)
-
-        for i in range(self.batch_size):
-            for j in range(10):
-                if self.A3[i][0] == [j]:
-                    self.dA2[i][j] = self.A2[i][j] - 1 
+        self.dZ2 = np.zeros(self.A2.shape)
+        (m , kind) = self.A2.shape
+        for i in range(m):
+            for j in range(kind):
+                if self.A3[i] == j:
+                    self.dZ2[i][j] = self.A2[i][j] - 1 
                 else:
-                    self.dA2[i][j] = self.A2[i][j]
+                    self.dZ2[i][j] = self.A2[i][j]
         
-        
+        self.dW2 = np.dot(self.P1_fc.T, self.dZ2) / m
+        self.db2 = np.sum(self.dZ2) / m
+        self.dP1_fc = np.dot(self.dZ2, self.W2.T)
+
+        self.dP1 = self.dP1_fc.reshape(m, 14,14,32)
+        self.dA1 = pool_back(self.dP1, (self.A1,self.hparameters_pool_max))
+        self.dZ1 = self.dA1 * d_relu(self.Z1)
+
+        _, self.dW1, self.db1 = conv_back(self.dZ1, (batch[0], self.W1, self.b1, self.hparameters_conv))
+
+
     def random_batch(self, X, Y, mini_batch_size=64, seed=0):
         m = X.shape[0]                  # number of training examples
         mini_batches = []
@@ -259,5 +289,5 @@ class model:
         return mini_batches
 
 
-cnn = model(0.1, 8, 'datasets', 500)
+cnn = model(0.1, 1, 'datasets', 500)
 cnn.train()

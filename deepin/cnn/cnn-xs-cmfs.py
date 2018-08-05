@@ -36,10 +36,10 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits= Z2, lab
 seed = 0
 costs = []
 learning_rate = 0.1
-num_epochs = 2000
+num_epochs = 500
 m = mnist.train.images.shape[0]
 
-minibatch_size = 8
+minibatch_size = 1
 optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 #optimizer = tf.train.GradientDescentOptimizer(learning_rate = learning_rate).minimize(cost)
 #print("m is",m)
