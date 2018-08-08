@@ -179,9 +179,9 @@ def pool_back(dA, cache, mode="max"):
 
 class model:
     np.random.seed(1)
-    W1 = np.random.randn(5,5,1,32)
+    W1 = np.random.randn(5,5,1,32) * 0.1
     b1 = np.zeros((1,1,1,32))
-    W2 = np.random.randn(14*14*32, 10)
+    W2 = np.random.randn(14*14*32, 10) * 0.1
     b2 = np.zeros((10))
     hparameters_conv = {'strides':1, 'pad':2}
     hparameters_pool_max = {'f':2, 'strides':2}
@@ -220,14 +220,19 @@ class model:
         print(self.P1_fc.shape)
         self.Z2 = np.dot(self.P1_fc, self.W2) + self.b2
         print(self.Z2.shape)
+        print("self.Z2", self.Z2)
         self.A2 = softmax(self.Z2)
+        print("self.A2",self.A2)
         #self.A3 = np.argmax(self.A2, axis= 1)
         #self.A3 = self.A3 == np.argmax(batch[1], axis = 1)
         self.A3 = np.argmax(batch[1], axis=1)
-        acc_temp = np.sum(np.argmax(self.A2, axis=1) == self.A3) / batch[0].shape[0]
+        print("self A3 is",self.A3)
+        self.A4 = np.argmax(self.A2, axis=1)
+        print("self.A4 softmax + argmax",self.A4)
+        acc_temp = np.sum(np.argmax(self.A2, axis=1) ==  self.A3) / batch[0].shape[0]
         self.acc.append(acc_temp)
         #print(self.A2.shape)
-        print(acc_temp)
+        print("acc:",acc_temp)
 
     def update(self):
         self.W1 -= self.learning_rate * self.dW1
@@ -289,5 +294,5 @@ class model:
         return mini_batches
 
 
-cnn = model(0.1, 1, 'datasets', 500)
+cnn = model(0.1, 4, 'datasets', 500)
 cnn.train()

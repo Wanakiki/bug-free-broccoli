@@ -223,7 +223,7 @@ class model:
         self.A3 = relu(self.Z3)
 
         self.Z4 = np.dot(self.A3, self.W_fc2) + self.b_fc2
-        self.A4 = softmax(Z4)
+        self.A4 = softmax(self.Z4)
 
     def initialize(self):
         self.W1 = np.random.randn(5,5,1,32)

@@ -14,11 +14,25 @@ Cousera 上的课程没有对CNN的反向传播进行详细的解释，仅仅在
 
 手写数字的尝试：
 
-- 简单的神经网络：[cnn-xs-first.py](cnn-xs-first.py)
-- 卷积神经网络：[cnn-xs-second.py](cnn-xs-second.py)，因为采用了Adam算法，训练速度很快，并且成功率较高，但我还是想尝试梯度下降加上minibatch
-- 卷积神经网络，结构与第二版相同，但是采用梯度下降和minibatch的算法：[cnn-xs-third.py](cnn-xs-third.py)
-- 由上面的卷积神经网络简化得到的卷积神经网络，少了三层，但是效果并不是很差：[cnn-xs-cmfs.py](cnn-xs-cmfs.py)
+1. 简单的神经网络：[cnn-xs-first.py](cnn-xs-first.py)
+2. 卷积神经网络：[cnn-xs-second.py](cnn-xs-second.py)，因为采用了Adam算法，训练速度很快，并且成功率较高，但我还是想尝试梯度下降加上minibatch。
+    
+    (Conv-layer -> relu -> max-pooling -> Conv-layer -> relu -> max-pooling -> Full-connect -> Full-connect ->softma)
+3. 卷积神经网络，结构与第二版相同，但是采用梯度下降和minibatch的算法：[cnn-xs-third.py](cnn-xs-third.py)
+4. [cnn-xs-fourth.py](cnn-xs-fourth.py)，根据复杂的CNN结构所写的纯python解决方式。
+5. 由上面的卷积神经网络简化得到的卷积神经网络，少了三层，但是效果并不是很差：[cnn-xs-cmfs.py](cnn-xs-cmfs.py)
+6. 简化后的CNN不用框架的版本：[easy_cnn.py](easy_cnn.py)
 
+***
+
+## 问题
+
+### 是不是说神经网络的层数越多，最后输出的结果就越小呢？
+
+在我自己尝试不用框架实现CNN的过程中，当我将在tensorflow中文社区上看到的网络结构简化之后，我发现softmax函数计算出的结果出现了``nan``，我觉得这个是个很难处理的问题。因为softmax计算的是指数，所以如果有一个输入稍微大了点，结果就会变得很大。
+
+可能是因为图片的值比较大，所以导致了这个结果，但是我觉得MNIST数据集里面不会有很大的像素值。就我目前遇到的情况，参数的初始化有正有负，绝对值不过一。是不是对于这种特殊的情况，初始化要做更多的操作，还是我的计算过程出了问题？
+***
 
 ## 一些有用的函数/方程
 
