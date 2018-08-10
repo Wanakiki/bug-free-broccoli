@@ -140,8 +140,8 @@ def conv_back(dZ, cache):
                     dW[:, :, :, c] += a_slice * dZ[i, h, w, c]
                     db[:, :, :, c] += dZ[i, h, w, c]
 
-    # 截去边缘就很秀
-    dA_prev[i, :, :, :] = dA_prev_pad[i, pad:-pad, pad: -pad, :]
+        # 截去边缘就很秀
+        dA_prev[i, :, :, :] = dA_prev_pad[i, pad:-pad, pad: -pad, :]
     return dA_prev, dW, db
 
 
