@@ -5,11 +5,7 @@ from skimage import io, transform
 import os
 import glob
 
-
-# 设置图片的尺寸
-
-# 读取图片和标签的函数
-
+# 省去了许多不必要的参数
 
 def read_image(path):
     label_dir = [path+x for x in os.listdir(path) if os.path.isdir(path+x)]
@@ -22,7 +18,6 @@ def read_image(path):
             image = transform.resize(image, (32, 32, 1))
             images.append(image)
             labels.append(index)
-        break
     return np.asarray(images, dtype=np.float32), np.asarray(labels, dtype=np.int32)
 
 
@@ -59,21 +54,20 @@ def conv_setp(a_slice_prev, W, b):
     return np.sum(np.multiply(a_slice_prev, W) + b)
 
 
-def conv2d(A_prev, W, b, stride, pad):
+def conv2d(A_prev, W, b, stride):
     """
     卷积 需要一个字典
     """
     # 获取形状和其他基本信息
     (m, n_h_prev, n_w_prev, n_c_prev) = np.shape(A_prev)
     (f, f, n_c_prev, n_c) = np.shape(W)
-    n_h = int((n_h_prev - f + 2*pad) / stride + 1)
-    n_w = int((n_w_prev - f + 2*pad) / stride + 1)
+    n_h = int((n_h_prev - f ) / stride + 1)
+    n_w = int((n_w_prev - f ) / stride + 1)
 
-    A_prev_pad = zero_pad(A_prev, pad)
     #assert(A_prev_pad.shape == (8,32,32,1))
     Z = np.zeros((m, n_h, n_w, n_c))  # 初始化结果
     for i in range(m):
-        a_prev_pad = A_prev_pad[i]
+        a_prev = A_prev[i]
         for h in range(n_h):
             for w in range(n_w):
                 for c in range(n_c):
@@ -83,7 +77,7 @@ def conv2d(A_prev, W, b, stride, pad):
                     horiz_start = w * stride
                     horiz_end = horiz_start + f
 
-                    a_slice = a_prev_pad[vert_start: vert_end,
+                    a_slice = a_prev[vert_start: vert_end,
                                          horiz_start: horiz_end, :]
                     Z[i, h, w, c] = conv_setp(
                         a_slice, W[:, :, :, c], b[:, :, :, c])
@@ -122,9 +116,9 @@ def max_pool(A_prev, strides, f):
 def conv_back(dZ, cache):
     """
     卷积层的反向传播,
-    (A_prev, W, b, pad, strides) = cache
+    (A_prev, W, b, strides) = cache
     """
-    (A_prev, W, b, pad, strides) = cache
+    (A_prev, W, b, strides) = cache
     (f, f, n_c_prev, n_c) = np.shape(W)
     (m, n_h_prev, n_w_prev, n_c_prev) = A_prev.shape
     (m, n_h, n_w, n_c) = np.shape(dZ)
@@ -133,12 +127,9 @@ def conv_back(dZ, cache):
     dW = np.zeros((f, f, n_c_prev, n_c))
     db = np.zeros((1, 1, 1, n_c))
 
-    A_prev_pad = zero_pad(A_prev, pad)
-    dA_prev_pad = zero_pad(dA_prev, pad)
-
     for i in range(m):
-        a_prev_pad = A_prev_pad[i]
-        da_prev_pad = dA_prev_pad[i]
+        a_prev = A_prev[i]
+        da_prev = dA_prev[i]
         for h in range(n_h):
             for w in range(n_w):
                 for c in range(n_c):
@@ -148,16 +139,14 @@ def conv_back(dZ, cache):
                     horiz_start = w * strides
                     horiz_end = horiz_start + f
 
-                    a_slice = a_prev_pad[vert_start: vert_end,
+                    a_slice = a_prev[vert_start: vert_end,
                                          horiz_start: horiz_end, :]
 
-                    da_prev_pad[vert_start:vert_end, horiz_start:horiz_end,
+                    da_prev[vert_start:vert_end, horiz_start:horiz_end,
                                 :] += W[:, :, :, c] * dZ[i, h, w, c]
                     dW[:, :, :, c] += a_slice * dZ[i, h, w, c]
                     db[:, :, :, c] += dZ[i, h, w, c]
 
-        # 截去边缘就很秀
-        dA_prev[i, :, :, :] = dA_prev_pad[i, pad:-pad, pad: -pad, :]
     return dA_prev, dW, db
 
 
@@ -194,21 +183,21 @@ def pool_back(dA, cache, mode="max"):
 
 class model:
     np.random.seed(1)
-    W1 = np.random.randn(5,5,1,6)
+    W1 = np.random.randn(5,5,1,6)*0.01
     b1 = np.zeros((1,1,1,6))
     pad = 0
     stride = 1
     f = 2
     stride = 2
-    W2 = np.random.randn(5,5,6,16)
+    W2 = np.random.randn(5,5,6,16)*0.01
     b2 = np.zeros((1,1,1,16))
 
-    W_fc1 = np.random.randn(400,120)
-    b_fc1 = np.zeros((120,1))
-    W_fc2 = np.random.randn(120,84)
-    b_fc2 = np.zeros((84,1))
-    W_fc3 = np.random.randn(84,10)
-    b_fc3 = np.zeros((10,1))
+    W_fc1 = np.random.randn(400,120)*0.01
+    b_fc1 = np.zeros((120))
+    W_fc2 = np.random.randn(120,84)*0.01
+    b_fc2 = np.zeros((84))
+    W_fc3 = np.random.randn(84,10)*0.01
+    b_fc3 = np.zeros((10))
 
     acc = []
 
@@ -250,6 +239,7 @@ class model:
                 batch_num += 1
                 self.back_ward(train_data_batch)
                 self.update(self.learning_rate)
+                print("Finish update acc is:", acc)
             print("train acc %s" % (train_acc/batch_num))
 
         test_acc, batch_num = 0, 0
@@ -261,12 +251,12 @@ class model:
 
 
     def forward(self, data_batch, label_batch):
-        self.Z1 = conv2d(data_batch, self.W1, self.b1, 1, 0)
+        self.Z1 = conv2d(data_batch, self.W1, self.b1, 1)
         self.A1 = relu(self.Z1)
 
         self.P1 = max_pool(self.A1, 2, 2)
         
-        self.Z2 = conv2d(self.P1, self.W2, self.b2, 1, 0)
+        self.Z2 = conv2d(self.P1, self.W2, self.b2, 1)
         self.A2 = relu(self.Z2)
 
         self.P2 = max_pool(self.A2, 2, 2)
@@ -313,11 +303,11 @@ class model:
         self.dA2 = pool_back(self.dP, (self.A2, 2,2))
         self.dZ2 = self.dA2 * d_relu(self.A2)
 
-        self.dP1, self.dW2, self.db2 = conv_back(self.dZ2, (self.P1, self.W2, self.b2, 0, 1))
+        self.dP1, self.dW2, self.db2 = conv_back(self.dZ2, (self.P1, self.W2, self.b2, 1))
         self.dA1 = pool_back(self.dP1, (self.A1, 2,2))
         self.dZ1 = self.dA1 * d_relu(self.A1)
 
-        _, self.dW1, self.db1 = conv_back(self.dZ1, (train_data_batch, self.W1, self.b1, 0, 1))
+        _, self.dW1, self.db1 = conv_back(self.dZ1, (train_data_batch, self.W1, self.b1, 1))
 
     def update(self, learning_rate):
         self.W1 -= learning_rate * self.dW1

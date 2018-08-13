@@ -87,7 +87,7 @@ class MLP:
         if flag:
             self.error.append((self.caches["dZ"+str(self.L-1)]**2).sum() / m)  #每个循环次统计一次，不然图像太紧
         for l in reversed(range(1, self.L)):
-            self.caches["dW"+str(l)] = np.dot(self.caches["dZ"+str(l)],self.caches["A"+str(l-1)].T) / m # dW同样需要除m
+            self.caches["dW"+str(l)] = np.dot(self.caches["dZ"+str(l)],self.caches["A"+str(l-1)].T) /m  # dW同样需要除m
             if l != self.L-1:
                 self.caches["db"+str(l)] = np.sum(self.caches["dZ"+str(l)]) / m
             if l != 1:
