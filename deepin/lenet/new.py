@@ -8,8 +8,8 @@ w = 32
 h = 32
 c = 1
 #mnist数据集中训练数据和测试数据保存地址
-train_path = "E:/data/datasets/mnist/train/"
-test_path = "E:/data/datasets/mnist/test/"
+train_path = "mnist/train/"
+test_path = "mnist/test/"
 #读取图片及其标签函数
 
 
@@ -140,8 +140,9 @@ y = inference(x, False, None)
 cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
     logits=y, labels=y_)
 cross_entropy_mean = tf.reduce_mean(cross_entropy)
-loss = cross_entropy_mean + tf.add_n(tf.get_collection('losses'))
-train_op = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
+# loss = cross_entropy_mean + tf.add_n(tf.get_collection('losses'))
+loss = cross_entropy_mean 
+train_op = tf.train.AdamOptimizer(0.001).minimize(loss)
 correct_prediction = tf.equal(tf.cast(tf.argmax(y, 1), tf.int32), y_)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 #每次获取batch_size个样本进行训练或测试

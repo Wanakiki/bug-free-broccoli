@@ -18,13 +18,16 @@ def read_image(path):
     images = []
     labels = []
     for index, floder in enumerate(label_dir):
+        sum = 0
         for img in glob.glob(floder+'/*.png'):
+            if(sum == 128):
+                break
             print("reading the image:%s"%img)
             image = io.imread(img)
             image = transform.resize(image, (w,h,c))
             images.append(image)
             labels.append(index)
-        break
+            sum +=        
     return np.asarray(images, dtype=np.float32), np.asarray(labels, dtype=np.int32)
 
 
@@ -126,7 +129,25 @@ with tf.Session() as sess:
             err, acc = sess.run([cross_entropy, accuracy], feed_dict={
                                    X: test_data_batch, Y: test_label_batch})
             test_loss += err
+            test_acc += acctrain_loss, train_acc, batch_num = 0, 0, 0
+        for train_data_batch, train_label_batch in get_batch(train_data, train_label, batch_size):
+            _, err, acc = sess.run([train_op, cross_entropy, accuracy], feed_dict={
+                                   X: train_data_batch, Y: train_label_batch})
+            train_loss += err
+            train_acc += acc
+            batch_num += 1
+        print("train loss %s" % (train_loss/batch_num))
+        print("train acc %s" % (train_acc/batch_num))
+
+        test_loss, test_acc, batch_num = 0, 0, 0
+        for test_data_batch, test_label_batch in get_batch(test_data, test_label, batch_size):
+            err, acc = sess.run([cross_entropy, accuracy], feed_dict={
+                X: test_data_batch, Y: test_label_batch})
+            test_loss += err
             test_acc += acc
+            batch_num += 1
+        print("test loss %s" % (test_loss/batch_num))
+        print("test acc %s" % (test_acc/batch_num))
             batch_num += 1
         print("test loss %s" % (test_loss/batch_num))
         print("test acc %s" % (test_acc/batch_num))
